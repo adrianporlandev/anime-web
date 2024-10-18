@@ -1,0 +1,53 @@
+---
+import { Icon } from 'astro-icon/components';
+// Importa la función de búsqueda
+import { fetchAnimeByName } from '../lib/api.js';
+
+let searchQuery = '';
+let searchResults = [];
+let isLoading = false;
+
+// Función para manejar el envío del formulario
+async function handleSearch(event) {
+  event.preventDefault();
+  isLoading = true;
+
+  try {
+    // Llama a la función para buscar animes
+    searchResults = await fetchAnimeByName(searchQuery);
+  } catch (error) {
+    console.error(error);
+    searchResults = []; // En caso de error, resetea los resultados
+  } finally {
+    isLoading = false;
+  }
+}
+---
+
+<form onSubmit={handleSearch} class="flex items-center">
+  <input
+    type="text"
+    placeholder="Buscar anime..."
+    value={searchQuery}
+    onInput={(e) => (searchQuery = e.target.value)}
+    class="bg-gray-800 text-white rounded px-2 py-1 focus:outline-none"
+  />
+  <button type="submit" class="ml-2 p-2 bg-blue-600 rounded hover:bg-blue-700">
+    <Icon name="mdi:magnify" />
+  </button>
+</form>
+
+{isLoading && <p>Cargando...</p>}
+
+<div class="anime-results grid grid-cols-3 gap-4">
+  {searchResults.map((anime) => (
+    <div class="anime-card border p-4 rounded" key={anime.mal_id}>
+      <img src={anime.images.jpg.large_image_url} alt={anime.title} class="w-full h-auto" />
+      <h3 class="font-bold">{anime.title}</h3>
+      <p>Score: {anime.score}</p>
+      <p>Rank: {anime.rank}</p>
+      <p>Members: {anime.members}</p>
+      <a href={`/anime/${anime.mal_id}`} class="text-blue-500">Ver detalles</a>
+    </div>
+  ))}
+</div>

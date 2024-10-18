@@ -1,0 +1,147 @@
+---
+import { fetchAnimeById, fetchTopAnimes, fetchAnimeCharacters, fetchAnimeStaff, fetchAnimeReviews } from '../../lib/api';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  const topAnimes = await fetchTopAnimes();
+  return topAnimes.map((anime) => ({
+    params: { id: anime.mal_id.toString() }
+  }));
+}
+
+const { id } = Astro.params;
+let anime = null;
+let error = null;
+
+try {
+  anime = await fetchAnimeById(id);
+} catch (err) {
+  error = 'Error al cargar los detalles del anime';
+}
+---
+
+<Layout title={anime ? anime.title : 'Anime'}>
+  <main class="w-full p-0 bg-gray-900 text-white">
+    {error ? (
+      <p>{error}</p>
+    ) : (
+      anime && (
+        <div class="anime-details">
+          <div class="w-full h-[400px] relative overflow-hidden">
+            <iframe
+              class="absolute top-0 left-0 w-full h-full"
+              src={`https://www.youtube.com/embed/${anime.trailer.youtube_id}?autoplay=1&mute=1&loop=1&controls=0&playlist=${anime.trailer.youtube_id}`}
+              frameborder="0"
+              allow="autoplay; encrypted-media"
+              allowfullscreen
+              style="transform: scale(1.90); transform-origin: center;"
+            ></iframe>
+          </div>
+          <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-start md:items-end justify-between relative z-10 mt-[-150px]">
+              <img src={anime.images.jpg.large_image_url} alt={anime.title} class="w-80 h-auto rounded-md shadow-lg mb-4 md:mb-0" />
+              <div class="md:ml-8 flex-grow">
+                <h1 class="text-4xl font-bold text-white mb-2">{anime.title}</h1>
+                <div class="flex items-center space-x-2 mb-4">
+                  <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                  </svg>
+                  <span class="text-xl">{anime.score}</span>
+                </div>
+                <div class="flex flex-wrap gap-4 mb-4">
+                  <button class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Watching
+                  </button>
+                  <button class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                    </svg>
+                    To Watch
+                  </button>
+                  <button class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Watched
+                  </button>
+                  <button class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    Add to Collection
+                  </button>
+                </div>
+                <a href={`https://www.youtube.com/watch?v=${anime.trailer.youtube_id}`} target="_blank" class="inline-block">
+                  <button class="bg-white text-gray-900 px-6 py-3 rounded-full font-bold hover:bg-gray-200 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                    </svg>
+                    Watch Trailer
+                  </button>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div id="overview" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <h2 class="text-2xl font-bold mb-4">Details</h2>
+                <dl class="space-y-2">
+                  {[
+                    ['Type', anime.type],
+                    ['Episodes', anime.episodes],
+                    ['Status', anime.status],
+                    ['Aired', `${anime.aired.from} to ${anime.aired.to}`],
+                    ['Premiered', `${anime.season} ${anime.year}`],
+                    ['Broadcast', anime.broadcast.string],
+                    ['Producers', anime.producers.map(p => p.name).join(', ')],
+                    ['Licensors', anime.licensors.map(l => l.name).join(', ')],
+                    ['Studios', anime.studios.map(s => s.name).join(', ')],
+                    ['Source', anime.source],
+                    ['Genres', anime.genres.map(g => g.name).join(', ')],
+                    ['Duration', anime.duration],
+                    ['Rating', anime.rating],
+                  ].map(([key, value]) => (
+                    <div class="flex">
+                      <dt class="w-24 font-medium text-gray-400">{key}</dt>
+                      <dd>{value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+              <div>
+                <h2 class="text-2xl font-bold mb-4">Synopsis</h2>
+                <p class="text-sm leading-relaxed">{anime.synopsis}</p>
+              </div>
+            </div>
+          </div>
+
+          <div id="relations" class="tab-content hidden">
+            <h2 class="text-2xl font-bold mb-4">Related Anime</h2>
+            <ul class="space-y-2">
+              {anime.relations.map((relation) => (
+                <li>
+                  {relation.relation}: {relation.entry.map(e => e.name).join(', ')}
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+        </div>
+      )
+    )}
+  </main>
+</Layout>
+
+<style>
+  .anime-details img {
+    max-width: 100%;
+    height: auto;
+  }
+  
+</style>
+

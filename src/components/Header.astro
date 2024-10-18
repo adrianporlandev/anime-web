@@ -1,0 +1,62 @@
+---
+import { Icon } from 'astro-icon/components'
+const currentPath = Astro.url.pathname;
+import SearchWidget from './SearchWidget.astro';
+---
+
+<header class="bg-gray-900 text-white py-4">
+  <div class="max-w-6xl mx-auto flex justify-between items-center px-4">
+    <div class="flex items-center">
+      <h1 class="text-2xl font-bold">AN</h1>
+      <nav class="ml-6">
+        <ul class="flex space-x-4">
+          <li>
+            <a 
+              href="/" 
+              class={`nav-link text-gray-400 hover:text-white font-bold ${currentPath === '/' ? 'active text-white' : ''}`}
+            >
+              Inicio
+            </a>
+          </li>
+          <li>
+            <a 
+              href="/releases" 
+              class={`nav-link text-gray-400 hover:text-white font-bold ${currentPath === '/releases' ? 'active text-white' : ''}`}
+            >
+              Releases
+            </a>
+          </li>
+          <li>
+            <a 
+              href="/horario" 
+              class={`nav-link text-gray-400 hover:text-white font-bold ${currentPath === '/horario' ? 'active text-white' : ''}`}
+            >
+              Horario
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    <div class="flex items-center">
+      <SearchWidget />
+      <div class="ml-4">
+        <button class="focus:outline-none">
+          <Icon name="mdi:moon-waxing-crescent" />
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    navLinks.forEach(link => {
+      if (link.getAttribute('href') === currentPath) {
+        link.classList.add('text-white');
+      }
+    });
+  });
+</script>

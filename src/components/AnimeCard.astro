@@ -1,0 +1,28 @@
+---
+// src/components/AnimeCard.astro
+
+const { title, image } = Astro.props;
+---
+
+<div class="anime-card">
+  <img src={image} alt={title} />
+  <h3>{title}</h3>
+</div>
+
+<style>
+  .anime-card {
+    flex: 0 0 auto; /* Evita que los elementos crezcan o se reduzcan */
+    width: 150px; /* Establece un ancho fijo para la tarjeta */
+    margin-right: 16px; /* Espaciado entre tarjetas */
+  }
+
+  .anime-card img {
+    width: 100%; /* Imagen responsiva */
+    border-radius: 8px;
+  }
+
+  .anime-card h3 {
+    font-size: 16px;
+    text-align: center;
+  }
+</style>
