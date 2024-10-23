@@ -16,10 +16,6 @@
 			"dest": "_render"
 		},
 		{
-			"src": "^\\/anime\\/([^/]+?)\\/?$",
-			"dest": "_render"
-		},
-		{
 			"src": "^\\/horario\\/?$",
 			"dest": "_render"
 		},
